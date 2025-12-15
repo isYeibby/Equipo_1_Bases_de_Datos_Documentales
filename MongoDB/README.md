@@ -115,47 +115,21 @@ MongoDB/
 │           ├── index.html        # Demo interactivo
 │           ├── styles.css        # Estilos modularizados
 │           └── app.js            # Lógica frontend
-├── capturas/                     # Screenshots del proyecto
+├── capturas/                     # Screenshots de Compass y MongoDB
 └── README.md                     # Esta documentación
 ```
 
 ---
 
-## Instalación y Uso
+## Uso
 
-### Requisitos Previos
-- Node.js v14 o superior
-- MongoDB v4.0 o superior
-- npm o yarn
 
-### Pasos de Instalación
-
-1. **Clonar el repositorio**
-```bash
-git clone https://github.com/isYeibby/Equipo_1_Bases_de_Datos_Documentales.git
-cd Equipo_1_Bases_de_Datos_Documentales/MongoDB/codigo/src
-```
-
-2. **Instalar dependencias**
-```bash
-npm install
-```
-
-3. **Iniciar MongoDB**
-```bash
-# Linux/Mac
-sudo systemctl start mongod
-
-# Windows
-net start MongoDB
-```
-
-4. **Iniciar el servidor**
+**Iniciar el servidor**
 ```bash
 npm start
 ```
 
-5. **Acceder a la aplicación**
+**Acceder a la aplicación**
 ```
 http://localhost:3900/index.html
 ```
@@ -275,31 +249,17 @@ db.articulos.aggregate([
 
 - **Backend:**
   - Node.js
-  - Express.js v5.1.0
-  - Mongoose v9.0.0
-  - CORS v2.8.5
+  - Express.js
+  - Mongoose
+  - CORS
 
 - **Base de Datos:**
-  - MongoDB v4.0+
+  - MongoDB
 
 - **Frontend:**
   - HTML5
-  - CSS3 (modularizado)
-  - JavaScript ES6+ (Vanilla)
-
----
-
-## Demo Interactivo
-
-El proyecto incluye una interfaz web completa en `/public/index.html` que permite:
-
-- Crear artículos mediante formularios
-- Visualizar artículos en tarjetas interactivas
-- Editar artículos con modal
-- Eliminar artículos con confirmación
-- Buscar por texto, categoría o autor
-- Ver queries MQL en tiempo real
-- Probar consultas avanzadas y aggregation
+  - CSS3
+  - JavaScript
 
 ---
 
@@ -320,13 +280,3 @@ El proyecto incluye una interfaz web completa en `/public/index.html` que permit
 - MongoDB Inc. (2024). *MongoDB's 2024 Year in Review*. MongoDB Blog. https://www.mongodb.com/company/blog/mongodbs-2024-year-in-review
 
 - RalanTech. (2025). *Advantages & Disadvantages of Using MongoDB (2025)*. https://www.ralantech.com/resources/advantages-disadvantages-of-using-mongodb-2025/
-
----
-
-## Licencia
-
-Este proyecto es parte del material educativo de Bases de Datos Documentales.
-
-## Autor
-
-Equipo 1 - Bases de Datos Documentales
