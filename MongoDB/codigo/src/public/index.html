@@ -3,1043 +3,703 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demo MongoDB - API REST Blog</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
-        }
-
-        header h1 {
-            font-size: 2.8em;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        header p {
-            font-size: 1.2em;
-            opacity: 0.95;
-            margin: 5px 0;
-        }
-
-        .header-badges {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .badge {
-            background: rgba(255,255,255,0.2);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            backdrop-filter: blur(10px);
-        }
-
-        .nav-tabs {
-            display: flex;
-            background: #f5f5f5;
-            padding: 0;
-            margin: 0;
-            overflow-x: auto;
-            border-bottom: 3px solid #667eea;
-        }
-
-        .nav-tab {
-            flex: 1;
-            min-width: 150px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            background: #f5f5f5;
-            border: none;
-            font-size: 1em;
-            font-weight: bold;
-            color: #666;
-            transition: all 0.3s;
-            border-right: 1px solid #ddd;
-        }
-
-        .nav-tab:hover {
-            background: #e0e0e0;
-        }
-
-        .nav-tab.active {
-            background: white;
-            color: #667eea;
-            border-bottom: 3px solid #667eea;
-            margin-bottom: -3px;
-        }
-
-        .content {
-            padding: 40px;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .section {
-            margin-bottom: 30px;
-        }
-
-        .section h2 {
-            color: #667eea;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid #667eea;
-            font-size: 2em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section h3 {
-            color: #764ba2;
-            margin-top: 25px;
-            margin-bottom: 15px;
-            font-size: 1.4em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .endpoint-card {
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            margin: 20px 0;
-            overflow: hidden;
-            transition: all 0.3s;
-        }
-
-        .endpoint-card:hover {
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            transform: translateY(-2px);
-        }
-
-        .endpoint-header {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 20px;
-            border-bottom: 2px solid #e0e0e0;
-        }
-
-        .endpoint-title {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-
-        .method {
-            display: inline-block;
-            padding: 8px 20px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 0.95em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .get { background: #61affe; color: white; }
-        .post { background: #49cc90; color: white; }
-        .put { background: #fca130; color: white; }
-        .delete { background: #f93e3e; color: white; }
-
-        .url {
-            font-family: 'Courier New', monospace;
-            background: #2d2d2d;
-            color: #4ec9b0;
-            padding: 8px 15px;
-            border-radius: 6px;
-            font-size: 1em;
-            flex: 1;
-        }
-
-        .description {
-            color: #555;
-            line-height: 1.8;
-            font-size: 1em;
-        }
-
-        .endpoint-body {
-            padding: 20px;
-        }
-
-        .code-section {
-            margin: 15px 0;
-        }
-
-        .code-label {
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 8px;
-            font-size: 1em;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .code-label::before {
-            content: "📋";
-        }
-
-        .code-block {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            padding: 20px;
-            border-radius: 8px;
-            overflow-x: auto;
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 0.95em;
-            line-height: 1.6;
-            position: relative;
-            border: 1px solid #333;
-        }
-
-        .code-block .json-key {
-            color: #9cdcfe;
-        }
-
-        .code-block .json-string {
-            color: #ce9178;
-        }
-
-        .code-block .json-number {
-            color: #b5cea8;
-        }
-
-        .code-block .json-boolean {
-            color: #569cd6;
-        }
-
-        .copy-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85em;
-            opacity: 0.7;
-            transition: opacity 0.3s;
-        }
-
-        .copy-btn:hover {
-            opacity: 1;
-        }
-
-        .mongodb-query {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 6px;
-        }
-
-        .mongodb-query-title {
-            font-weight: bold;
-            color: #856404;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .mongodb-query-title::before {
-            content: "🔍";
-            font-size: 1.2em;
-        }
-
-        .btn-container {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            font-size: 0.95em;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .btn-test {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-test:hover {
-            background: #5568d3;
-        }
-
-        .result {
-            margin-top: 20px;
-            padding: 20px;
-            background: #e8f5e9;
-            border-radius: 8px;
-            border-left: 4px solid #4caf50;
-            display: none;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .result.show {
-            display: block;
-            animation: slideDown 0.3s;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; max-height: 0; }
-            to { opacity: 1; max-height: 400px; }
-        }
-
-        .result.error {
-            background: #ffebee;
-            border-left-color: #f44336;
-        }
-
-        .result pre {
-            margin: 0;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.9em;
-        }
-
-        .checklist {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-        }
-
-        .checklist-item {
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.3s;
-        }
-
-        .checklist-item.completed {
-            background: #e8f5e9;
-        }
-
-        .checklist-item:hover {
-            transform: translateX(5px);
-        }
-
-        .checkbox {
-            width: 24px;
-            height: 24px;
-            border: 2px solid #667eea;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            flex-shrink: 0;
-        }
-
-        .checkbox.checked {
-            background: #667eea;
-        }
-
-        .info-box {
-            background: #e3f2fd;
-            border-left: 4px solid #2196f3;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 6px;
-        }
-
-        .info-box h4 {
-            color: #1976d2;
-            margin-bottom: 10px;
-        }
-
-        .warning-box {
-            background: #fff3e0;
-            border-left: 4px solid #ff9800;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 6px;
-        }
-
-        .success-box {
-            background: #e8f5e9;
-            border-left: 4px solid #4caf50;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 6px;
-        }
-
-        code {
-            background: #f5f5f5;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            color: #d63384;
-            font-size: 0.9em;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
-        }
-
-        .card {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border: 2px solid #e0e0e0;
-            transition: all 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            border-color: #667eea;
-        }
-
-        .card h4 {
-            color: #667eea;
-            margin-bottom: 12px;
-            font-size: 1.2em;
-        }
-
-        .card p {
-            color: #666;
-            line-height: 1.6;
-        }
-
-        .highlight-mongodb {
-            background: linear-gradient(135deg, #13aa52 0%, #00ed64 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-
-        .highlight-mongodb h3 {
-            color: white;
-            margin-bottom: 10px;
-        }
-
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .comparison-table th {
-            background: #667eea;
-            color: white;
-            padding: 15px;
-            text-align: left;
-            font-weight: bold;
-        }
-
-        .comparison-table td {
-            padding: 15px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .comparison-table tr:hover {
-            background: #f5f5f5;
-        }
-    </style>
+    <title>Demo Interactivo MongoDB - API REST Blog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
+        <!-- HEADER -->
         <header>
-            <h1>🚀 Demo MongoDB - API REST Blog</h1>
-            <p>Demostración completa de MongoDB Query Language (MQL) y BSON</p>
+            <h1>MongoDB</h1>
+            <p>Demostración Completa de MongoDB Query Language (MQL) y BSON</p>
             <p><strong>Base URL:</strong> http://localhost:3900/api</p>
-            <div class="header-badges">
-                <span class="badge">📊 MongoDB 9.0</span>
-                <span class="badge">🟢 Node.js + Express</span>
-                <span class="badge">🔥 Mongoose ODM</span>
-                <span class="badge">⚡ BSON Format</span>
-            </div>
         </header>
 
+        <!-- NAVIGATION TABS -->
         <div class="nav-tabs">
-            <button class="nav-tab active" onclick="switchTab('intro')">🏠 Introducción</button>
-            <button class="nav-tab" onclick="switchTab('crud')">📝 CRUD Básico</button>
-            <button class="nav-tab" onclick="switchTab('advanced')">🔍 Consultas Avanzadas</button>
-            <button class="nav-tab" onclick="switchTab('aggregation')">📊 Aggregation</button>
-            <button class="nav-tab" onclick="switchTab('indices')">🗂️ Índices</button>
+            <button class="nav-tab active" data-tab="crud">CRUD</button>
+            <button class="nav-tab" data-tab="search">Búsquedas</button>
+            <button class="nav-tab" data-tab="advanced">Consultas Avanzadas</button>
+            <button class="nav-tab" data-tab="aggregation">Aggregation</button>
+            <button class="nav-tab" data-tab="intro">Intro MQL/BSON</button>
         </div>
 
         <div class="content">
-            <!-- TAB: INTRODUCCIÓN -->
-            <div id="tab-intro" class="tab-content active">
+            <!-- ==================== TAB: CRUD INTERACTIVO ==================== -->
+            <div id="tab-crud" class="tab-content active">
                 <div class="section">
-                    <h2>🎯 ¿Por qué MongoDB es Especial?</h2>
+                    <h2>CRUD Interactivo - Gestiona tus Artículos</h2>
+
+                    <!-- CREATE: Formulario Interactivo -->
+                    <div class="endpoint-card">
+                        <div class="endpoint-header">
+                            <div class="endpoint-title">
+                                <span class="method post">POST</span>
+                                <span class="url">/api/articulo</span>
+                            </div>
+                            <div class="description">
+                                <strong>CREATE:</strong> Crea un nuevo artículo completando el formulario
+                            </div>
+                        </div>
+                        <div class="endpoint-body">
+                            <form id="form-create" class="interactive-form">
+                                <div class="form-group">
+                                    <label for="create-titulo">Título del Artículo *</label>
+                                    <input 
+                                        type="text" 
+                                        id="create-titulo" 
+                                        placeholder="Ej: Introducción a MongoDB" 
+                                        required
+                                    >
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="create-contenido">Contenido *</label>
+                                    <textarea 
+                                        id="create-contenido" 
+                                        placeholder="Escribe el contenido de tu artículo aquí..."
+                                        required
+                                    ></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="create-autor">Autor *</label>
+                                    <input 
+                                        type="text" 
+                                        id="create-autor" 
+                                        placeholder="Ej: Juan Pérez"
+                                        required
+                                    >
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="create-categoria">Categoría</label>
+                                    <select id="create-categoria">
+                                        <option value="Tecnología">Tecnología</option>
+                                        <option value="Ciencia">Ciencia</option>
+                                        <option value="Educación">Educación</option>
+                                        <option value="Deportes">Deportes</option>
+                                        <option value="Arte">Arte</option>
+                                        <option value="Salud">Salud</option>
+                                    </select>
+                                </div>
+
+                                <div class="btn-container">
+                                    <button type="submit" id="create-btn" class="btn-primary">
+                                        Crear Artículo
+                                    </button>
+                                </div>
+                            </form>
+
+                            <div class="mongodb-query">
+                                <div class="mongodb-query-title">Query MQL que se ejecuta:</div>
+                                <div class="code-block">db.articulos.insertOne({
+  titulo: "Tu título aquí",
+  contenido: "Tu contenido aquí",
+  autor: "Tu nombre aquí",
+  categoria: "Categoría seleccionada",
+  fecha: new Date(),
+  visitas: 0,
+  publicado: true
+})</div>
+                            </div>
+
+                            <div id="result-create" class="result"></div>
+                        </div>
+                    </div>
+
+                    <!-- READ: Visualización de Artículos -->
+                    <div class="endpoint-card">
+                        <div class="endpoint-header">
+                            <div class="endpoint-title">
+                                <span class="method get">GET</span>
+                                <span class="url">/api/articulo</span>
+                            </div>
+                            <div class="description">
+                                <strong>READ:</strong> Visualiza todos los artículos creados
+                            </div>
+                        </div>
+                        <div class="endpoint-body">
+                            <div class="mongodb-query">
+                                <div class="mongodb-query-title">Query MQL Equivalente:</div>
+                                <div class="code-block">db.articulos.find({}).sort({ fecha: -1 })</div>
+                            </div>
+
+                            <div class="btn-container">
+                                <button class="btn-refresh" onclick="loadArticles()">
+                                    Recargar Artículos
+                                </button>
+                            </div>
+
+                            <div id="articles-grid" class="articles-grid">
+                                <!-- Los artículos se cargan aquí dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DELETE: Resultado -->
+                    <div class="endpoint-card">
+                        <div class="endpoint-header">
+                            <div class="endpoint-title">
+                                <span class="method delete">DELETE</span>
+                                <span class="url">/api/articulo/:id</span>
+                            </div>
+                            <div class="description">
+                                <strong>DELETE:</strong> Elimina un artículo
+                            </div>
+                        </div>
+                        <div class="endpoint-body">
+                            <div class="mongodb-query">
+                                <div class="mongodb-query-title">🔍 Query MQL Equivalente:</div>
+                                <div class="code-block">db.articulos.findByIdAndDelete("675d1234567890abcdef1234")</div>
+                            </div>
+
+                            <div id="result-delete" class="result"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== TAB: BÚSQUEDAS ==================== -->
+            <div id="tab-search" class="tab-content">
+                <div class="section">
+                    <h2>Búsquedas Avanzadas</h2>
+
+                    <div class="endpoint-card">
+                        <div class="endpoint-header">
+                            <div class="endpoint-title">
+                                <span class="method get">GET</span>
+                                <span class="url">/api/buscar/*</span>
+                            </div>
+                            <div class="description">
+                                <strong>SEARCH:</strong> Busca artículos por texto, categoría o autor
+                            </div>
+                        </div>
+                        <div class="endpoint-body">
+                            <form id="form-search" class="interactive-form">
+                                <div class="form-group">
+                                    <label for="search-type">Tipo de Búsqueda</label>
+                                    <select id="search-type">
+                                        <option value="texto">Búsqueda de texto completo</option>
+                                        <option value="categoria">Por categoría</option>
+                                        <option value="autor">Por autor</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="search-text">Término de Búsqueda</label>
+                                    <input 
+                                        type="text" 
+                                        id="search-text" 
+                                        placeholder="Escribe lo que quieres buscar..."
+                                        required
+                                    >
+                                </div>
+
+                                <div class="btn-container">
+                                    <button type="submit" id="search-btn" class="btn-primary">
+                                        Buscar
+                                    </button>
+                                </div>
+                            </form>
+
+                            <div class="mongodb-query">
+                                <div class="mongodb-query-title">🔍 Query MQL para Búsqueda de Texto:</div>
+                                <div class="code-block">db.articulos.find(
+  { $text: { $search: "término" } },
+  { score: { $meta: "textScore" } }
+).sort({ score: { $meta: "textScore" } })</div>
+                            </div>
+
+                            <div id="search-results" class="search-results">
+                                <!-- Resultados aquí -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== TAB: CONSULTAS AVANZADAS ==================== -->
+            <div id="tab-advanced" class="tab-content">
+                <div class="section">
+                    <h2>Consultas Avanzadas con Operadores MQL</h2>
+
+                    <!-- Operadores Lógicos -->
+                    <div class="endpoint-card">
+                        <div class="endpoint-header">
+                            <div class="endpoint-title">
+                                <span class="method get">GET</span>
+                                <span class="url">/api/buscar/operadores</span>
+                            </div>
+                            <div class="description">
+                                <strong>Operadores Lógicos:</strong> $and, $or, $not, $nor
+                            </div>
+                        </div>
+                        <div class="endpoint-body">
+                            <div class="mongodb-query">
+                                <div class="mongodb-query-title">🔍 Query MQL con $or:</div>
+                                <div class="code-block">db.articulos.find({
+  $or: [
+    { categoria: "Tecnología" },
+    { categoria: "Ciencia" }
+  ]
+})</div>
+                            </div>
+
+                            <div class="mongodb-query">
+                                <div class="mongodb-query-title">🔍 Query MQL con $and:</div>
+                                <div class="code-block">db.articulos.find({
+  $and: [
+    { categoria: "Tecnología" },
+    { visitas: { $gte: 10 } },
+    { publicado: true }
+  ]
+})</div>
+                            </div>
+
+                            <div class="btn-container">
+                                <button class="btn-test" onclick="testOperadores()">
+                                    Probar Operador $or
+                                </button>
+                            </div>
+                            <div id="result-operadores" class="result"></div>
+                        </div>
+                    </div>
+
+                    <!-- Operadores de Comparación -->
+                    <div class="endpoint-card">
+                        <div class="endpoint-header">
+                            <div class="endpoint-title">
+                                <span class="method get">GET</span>
+                                <span class="url">/api/buscar/comparacion</span>
+                            </div>
+                            <div class="description">
+                                <strong>Operadores de Comparación:</strong> $gt, $gte, $lt, $lte, $in, $ne
+                            </div>
+                        </div>
+                        <div class="endpoint-body">
+                            <div class="mongodb-query">
+                                <div class="mongodb-query-title">🔍 Query MQL Equivalente:</div>
+                                <div class="code-block">db.articulos.find({
+  visitas: {
+    $gte: 5,    // Mayor o igual a 5
+    $lte: 100   // Menor o igual a 100
+  },
+  categoria: {
+    $in: ["Tecnología", "Ciencia"]  // En la lista
+  }
+}).sort({ visitas: -1 })</div>
+                            </div>
+
+                            <table class="comparison-table" style="margin-top: 20px;">
+                                <thead>
+                                    <tr>
+                                        <th>Operador</th>
+                                        <th>Significado</th>
+                                        <th>Ejemplo MQL</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>$gt</code></td>
+                                        <td>Mayor que (>)</td>
+                                        <td><code>{ visitas: { $gt: 10 } }</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>$gte</code></td>
+                                        <td>Mayor o igual (>=)</td>
+                                        <td><code>{ visitas: { $gte: 10 } }</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>$lt</code></td>
+                                        <td>Menor que (<)</td>
+                                        <td><code>{ visitas: { $lt: 100 } }</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>$lte</code></td>
+                                        <td>Menor o igual (<=)</td>
+                                        <td><code>{ visitas: { $lte: 100 } }</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>$in</code></td>
+                                        <td>En la lista</td>
+                                        <td><code>{ categoria: { $in: ["Tech", "Sci"] } }</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>$ne</code></td>
+                                        <td>No igual (!=)</td>
+                                        <td><code>{ status: { $ne: "deleted" } }</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="btn-container">
+                                <button class="btn-test" onclick="testComparacion()">
+                                    Probar Comparadores
+                                </button>
+                            </div>
+                            <div id="result-comparacion" class="result"></div>
+                        </div>
+                    </div>
+
+                    <!-- Búsqueda de Texto -->
+                    <div class="endpoint-card">
+                        <div class="endpoint-header">
+                            <div class="endpoint-title">
+                                <span class="method get">GET</span>
+                                <span class="url">/api/buscar/texto?texto=mongodb</span>
+                            </div>
+                            <div class="description">
+                                <strong>Text Search:</strong> Búsqueda de texto completo con índices
+                            </div>
+                        </div>
+                        <div class="endpoint-body">
+                            <div class="mongodb-query">
+                                <div class="mongodb-query-title">🔍 Query MQL Equivalente:</div>
+                                <div class="code-block">db.articulos.find(
+  { $text: { $search: "mongodb" } },
+  { score: { $meta: "textScore" } }
+).sort({ score: { $meta: "textScore" } })</div>
+                            </div>
+
+                            <div class="info-box">
+                                <strong>Requiere índice de texto:</strong>
+                                <div class="code-block" style="margin-top: 10px;">
+db.articulos.createIndex({ titulo: "text", contenido: "text" })
+                                </div>
+                            </div>
+
+                            <div class="btn-container">
+                                <button class="btn-test" onclick="testBuscarTexto()">
+                                    Probar Text Search
+                                </button>
+                            </div>
+                            <div id="result-texto" class="result"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== TAB: AGGREGATION ==================== -->
+            <div id="tab-aggregation" class="tab-content">
+                <div class="section">
+                    <h2>Aggregation Pipeline</h2>
+
+                    <div class="info-box">
+                        <h4>¿Qué es Aggregation Pipeline?</h4>
+                        <p>Un framework para procesamiento de datos que permite transformar y analizar documentos 
+                        mediante una secuencia de etapas (stages). Similar a tuberías en Unix.</p>
+                    </div>
+
+                    <!-- Estadísticas por Categoría -->
+                    <div class="endpoint-card">
+                        <div class="endpoint-header">
+                            <div class="endpoint-title">
+                                <span class="method get">GET</span>
+                                <span class="url">/api/estadisticas/categoria</span>
+                            </div>
+                            <div class="description">
+                                <strong>Aggregation:</strong> Estadísticas agrupadas por categoría
+                            </div>
+                        </div>
+                        <div class="endpoint-body">
+                            <div class="mongodb-query">
+                                <div class="mongodb-query-title">🔍 Aggregation Pipeline Completo:</div>
+                                <div class="code-block">db.articulos.aggregate([
+  // Stage 1: $match - Filtrar documentos
+  {
+    $match: { publicado: true }
+  },
+  
+  // Stage 2: $group - Agrupar y calcular
+  {
+    $group: {
+      _id: "$categoria",
+      total: { $sum: 1 },
+      totalVisitas: { $sum: "$visitas" },
+      promedioVisitas: { $avg: "$visitas" },
+      visitasMax: { $max: "$visitas" },
+      visitasMin: { $min: "$visitas" }
+    }
+  },
+  
+  // Stage 3: $project - Seleccionar campos
+  {
+    $project: {
+      _id: 0,
+      categoria: "$_id",
+      totalArticulos: "$total",
+      totalVisitas: 1,
+      promedioVisitas: { $round: ["$promedioVisitas", 2] }
+    }
+  },
+  
+  // Stage 4: $sort - Ordenar resultados
+  {
+    $sort: { totalArticulos: -1 }
+  }
+])</div>
+                            </div>
+
+                            <div class="grid" style="margin-top: 20px;">
+                                <div class="card">
+                                    <h4>$match</h4>
+                                    <p>Filtra documentos como <code>find()</code></p>
+                                    <div class="code-block" style="margin-top: 10px;">
+{ $match: { publicado: true } }
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <h4>$group</h4>
+                                    <p>Agrupa y calcula estadísticas</p>
+                                    <div class="code-block" style="margin-top: 10px;">
+{
+  $group: {
+    _id: "$categoria",
+    total: { $sum: 1 }
+  }
+}
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <h4>$project</h4>
+                                    <p>Selecciona y transforma campos</p>
+                                    <div class="code-block" style="margin-top: 10px;">
+{
+  $project: {
+    _id: 0,
+    nombre: "$_id"
+  }
+}
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <h4>$sort</h4>
+                                    <p>Ordena resultados</p>
+                                    <div class="code-block" style="margin-top: 10px;">
+{ $sort: { total: -1 } }
+// -1 = descendente
+// 1 = ascendente
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="btn-container">
+                                <button class="btn-test" onclick="testEstadisticas()">
+                                    Ver Estadísticas
+                                </button>
+                            </div>
+                            <div id="result-estadisticas" class="result"></div>
+                        </div>
+                    </div>
+
+                    <!-- Top Artículos -->
+                    <div class="endpoint-card">
+                        <div class="endpoint-header">
+                            <div class="endpoint-title">
+                                <span class="method get">GET</span>
+                                <span class="url">/api/estadisticas/mas-vistos?limite=5</span>
+                            </div>
+                            <div class="description">
+                                <strong>Aggregation con $limit:</strong> Top artículos más visitados
+                            </div>
+                        </div>
+                        <div class="endpoint-body">
+                            <div class="mongodb-query">
+                                <div class="mongodb-query-title">🔍 Pipeline con $limit:</div>
+                                <div class="code-block">db.articulos.aggregate([
+  { $match: { publicado: true } },
+  { $sort: { visitas: -1 } },
+  { $limit: 5 },
+  {
+    $project: {
+      titulo: 1,
+      autor: 1,
+      visitas: 1
+    }
+  }
+])</div>
+                            </div>
+
+                            <div class="btn-container">
+                                <button class="btn-test" onclick="testMasVistos()">
+                                    Ver Top 5 Más Vistos
+                                </button>
+                            </div>
+                            <div id="result-masvistos" class="result"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== TAB: INTRODUCCIÓN ==================== -->
+            <div id="tab-intro" class="tab-content">
+                <div class="section">
+                    <h2>MongoDB Query Language (MQL) y BSON</h2>
                     
                     <div class="highlight-mongodb">
-                        <h3>🍃 MongoDB Query Language (MQL)</h3>
-                        <p>MongoDB utiliza un lenguaje de consultas basado en JSON que permite operaciones complejas de manera intuitiva y expresiva.</p>
+                        <h3>¿Qué hace especial a MongoDB?</h3>
+                        <p style="font-size: 1.1em; line-height: 1.8;">
+                            MongoDB utiliza <strong>BSON (Binary JSON)</strong> como formato de almacenamiento y 
+                            <strong>MQL (MongoDB Query Language)</strong> para consultas, ofreciendo una experiencia 
+                            intuitiva y poderosa basada en documentos JSON.
+                        </p>
                     </div>
 
                     <table class="comparison-table">
                         <thead>
                             <tr>
-                                <th>Característica</th>
-                                <th>SQL Tradicional</th>
-                                <th>MongoDB (MQL + BSON)</th>
+                                <th style="width: 25%;">Característica</th>
+                                <th style="width: 37.5%;">SQL Tradicional</th>
+                                <th style="width: 37.5%;">MongoDB (MQL + BSON)</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><strong>Formato de Datos</strong></td>
-                                <td>Tablas y columnas rígidas</td>
-                                <td>Documentos BSON flexibles</td>
+                                <td><strong>Formato</strong></td>
+                                <td>Tablas con filas y columnas</td>
+                                <td>Colecciones con documentos BSON</td>
                             </tr>
                             <tr>
-                                <td><strong>Sintaxis de Consulta</strong></td>
-                                <td><code>SELECT * FROM tabla WHERE campo = 'valor'</code></td>
-                                <td><code>{ campo: "valor" }</code></td>
+                                <td><strong>Esquema</strong></td>
+                                <td>Rígido, predefinido</td>
+                                <td>Flexible, dinámico</td>
                             </tr>
                             <tr>
-                                <td><strong>Tipos de Datos</strong></td>
-                                <td>Limitados (int, varchar, date, etc.)</td>
-                                <td>Extendidos (ObjectId, Date, Array, Nested Docs)</td>
+                                <td><strong>Consulta Simple</strong></td>
+                                <td><code>SELECT * FROM users WHERE age > 18</code></td>
+                                <td><code>{ age: { $gt: 18 } }</code></td>
                             </tr>
                             <tr>
-                                <td><strong>Joins</strong></td>
-                                <td>JOIN, LEFT JOIN, RIGHT JOIN</td>
-                                <td>$lookup, documentos embebidos</td>
+                                <td><strong>Inserción</strong></td>
+                                <td><code>INSERT INTO users VALUES (...)</code></td>
+                                <td><code>{ name: "Juan", age: 25 }</code></td>
                             </tr>
                             <tr>
-                                <td><strong>Agregaciones</strong></td>
-                                <td>GROUP BY, HAVING</td>
-                                <td>Aggregation Pipeline</td>
+                                <td><strong>Agregación</strong></td>
+                                <td><code>GROUP BY, HAVING, JOIN</code></td>
+                                <td>Pipeline: <code>$match, $group, $project</code></td>
                             </tr>
                         </tbody>
                     </table>
 
+                    <div class="grid">
+                        <div class="card">
+                            <h4>BSON - Binary JSON</h4>
+                            <p>Formato binario optimizado que extiende JSON con:</p>
+                            <ul style="margin-left: 20px; margin-top: 10px;">
+                                <li><strong>ObjectId:</strong> IDs únicos de 12 bytes</li>
+                                <li><strong>Date:</strong> Timestamps precisos</li>
+                                <li><strong>Binary:</strong> Datos binarios eficientes</li>
+                                <li><strong>Performance:</strong> 2-3x más rápido que JSON</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h4>MQL - Query Language</h4>
+                            <p>Lenguaje de consultas basado en JSON que permite:</p>
+                            <ul style="margin-left: 20px; margin-top: 10px;">
+                                <li><strong>Sintaxis intuitiva:</strong> Similar a JavaScript</li>
+                                <li><strong>Operadores ricos:</strong> $gt, $in, $regex, etc.</li>
+                                <li><strong>Consultas complejas:</strong> Nested queries</li>
+                                <li><strong>Aggregation:</strong> Pipeline poderoso</li>
+                            </ul>
+                        </div>
+                    </div>
+
                     <div class="info-box">
-                        <h4>🔥 BSON (Binary JSON)</h4>
-                        <p>MongoDB almacena los datos en formato BSON, una representación binaria de JSON que:</p>
-                        <ul style="margin-left: 20px; margin-top: 10px;">
-                            <li>✅ Es más eficiente que JSON puro</li>
-                            <li>✅ Soporta tipos de datos adicionales (Date, ObjectId, Binary)</li>
-                            <li>✅ Permite recorrido rápido de documentos</li>
-                            <li>✅ Optimizado para lectura/escritura</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2>✅ Checklist de Funcionalidades</h2>
-                    <div class="checklist">
-                        <div class="checklist-item completed">
-                            <div class="checkbox checked">✓</div>
-                            <span>Configuración de MongoDB en localhost:27017</span>
-                        </div>
-                        <div class="checklist-item completed">
-                            <div class="checkbox checked">✓</div>
-                            <span>Conexión desde Node.js usando Mongoose</span>
-                        </div>
-                        <div class="checklist-item completed">
-                            <div class="checkbox checked">✓</div>
-                            <span>CREATE - Inserción con validación BSON</span>
-                        </div>
-                        <div class="checklist-item completed">
-                            <div class="checkbox checked">✓</div>
-                            <span>READ - Consultas con MQL</span>
-                        </div>
-                        <div class="checklist-item completed">
-                            <div class="checkbox checked">✓</div>
-                            <span>UPDATE - Operadores de actualización</span>
-                        </div>
-                        <div class="checklist-item completed">
-                            <div class="checkbox checked">✓</div>
-                            <span>DELETE - Eliminación por criterios</span>
-                        </div>
-                        <div class="checklist-item completed">
-                            <div class="checkbox checked">✓</div>
-                            <span>Text Search con índices</span>
-                        </div>
-                        <div class="checklist-item completed">
-                            <div class="checkbox checked">✓</div>
-                            <span>Operadores lógicos ($and, $or, $not)</span>
-                        </div>
-                        <div class="checklist-item completed">
-                            <div class="checkbox checked">✓</div>
-                            <span>Operadores de comparación ($gt, $lt, $in, $ne)</span>
-                        </div>
-                        <div class="checklist-item completed">
-                            <div class="checkbox checked">✓</div>
-                            <span>Aggregation Pipeline ($match, $group, $project)</span>
-                        </div>
-                        <div class="checklist-item completed">
-                            <div class="checkbox checked">✓</div>
-                            <span>Índices (simples, compuestos, texto)</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB: CRUD BÁSICO -->
-            <div class="section">
-                <h2>📝 1. Operaciones CRUD Básicas</h2>
-
-                <h3>CREATE - Crear Artículo</h3>
-                <div class="endpoint">
-                    <span class="method post">POST</span>
-                    <span class="url">/api/articulo</span>
-                    <div class="description">Crea un nuevo artículo en la base de datos.</div>
-                    <div class="example">
+                        <h4>Ejemplo de BSON en Acción</h4>
+                        <p>Cuando envías este JSON:</p>
+                        <div class="code-block" style="margin-top: 10px;">
 {
-  "titulo": "Mi primer artículo",
-  "contenido": "Este es el contenido del artículo",
-  "autor": "Juan Pérez",
-  "categoria": "Tecnología"
-}</div>
-                    <div class="btn-container">
-                        <button class="btn-test" onclick="testCrear()">🧪 Probar</button>
-                    </div>
-                    <div id="result-crear" class="result"></div>
-                </div>
-
-                <h3>READ - Listar Todos</h3>
-                <div class="endpoint">
-                    <span class="method get">GET</span>
-                    <span class="url">/api/articulo</span>
-                    <div class="description">Obtiene todos los artículos ordenados por fecha descendente.</div>
-                    <div class="btn-container">
-                        <button class="btn-test" onclick="testListar()">🧪 Probar</button>
-                    </div>
-                    <div id="result-listar" class="result"></div>
-                </div>
-
-                <h3>READ - Obtener Uno</h3>
-                <div class="endpoint">
-                    <span class="method get">GET</span>
-                    <span class="url">/api/articulo/:id</span>
-                    <div class="description">Obtiene un artículo específico por su ID e incrementa el contador de visitas.</div>
-                    <div class="info-box">
-                        <strong>💡 Nota:</strong> Primero crea un artículo o lista los existentes para obtener un ID válido.
-                    </div>
-                </div>
-
-                <h3>UPDATE - Actualizar</h3>
-                <div class="endpoint">
-                    <span class="method put">PUT</span>
-                    <span class="url">/api/articulo/:id</span>
-                    <div class="description">Actualiza un artículo existente.</div>
-                    <div class="example">
+  "titulo": "Mi artículo",
+  "fecha": "2025-12-14",
+  "autor": "Juan"
+}
+                        </div>
+                        <p style="margin-top: 10px;">MongoDB lo almacena como BSON con:</p>
+                        <div class="code-block" style="margin-top: 10px;">
 {
-  "titulo": "Título actualizado",
-  "contenido": "Contenido actualizado",
-  "categoria": "Ciencia"
-}</div>
-                </div>
-
-                <h3>DELETE - Eliminar</h3>
-                <div class="endpoint">
-                    <span class="method delete">DELETE</span>
-                    <span class="url">/api/articulo/:id</span>
-                    <div class="description">Elimina un artículo por su ID.</div>
-                </div>
-            </div>
-
-            <!-- CONSULTAS AVANZADAS -->
-            <div class="section">
-                <h2>🔍 2. Consultas Avanzadas</h2>
-
-                <h3>Búsqueda por Categoría</h3>
-                <div class="endpoint">
-                    <span class="method get">GET</span>
-                    <span class="url">/api/categoria/:categoria</span>
-                    <div class="description">Busca artículos por categoría específica.</div>
-                    <div class="btn-container">
-                        <button class="btn-test" onclick="testBuscarCategoria()">🧪 Probar</button>
+  "_id": ObjectId("675d1234567890abcdef1234"),
+  "titulo": "Mi artículo",
+  "fecha": ISODate("2025-12-14T00:00:00Z"),
+  "autor": "Juan"
+}
+                        </div>
                     </div>
-                    <div id="result-categoria" class="result"></div>
-                </div>
-
-                <h3>Búsqueda con Múltiples Filtros</h3>
-                <div class="endpoint">
-                    <span class="method get">GET</span>
-                    <span class="url">/api/buscar/filtros?autor=Juan&categoria=Tecnología&publicado=true</span>
-                    <div class="description">Busca artículos aplicando múltiples filtros simultáneamente.</div>
-                    <div class="btn-container">
-                        <button class="btn-test" onclick="testBuscarFiltros()">🧪 Probar</button>
-                    </div>
-                    <div id="result-filtros" class="result"></div>
-                </div>
-
-                <h3>Búsqueda por Texto (Text Search)</h3>
-                <div class="endpoint">
-                    <span class="method get">GET</span>
-                    <span class="url">/api/buscar/texto?texto=Node.js MongoDB</span>
-                    <div class="description">Búsqueda de texto completo en título y contenido. Requiere índice de texto.</div>
-                    <div class="warning-box">
-                        <strong>⚠️ Importante:</strong> Esta búsqueda utiliza el índice de texto creado en el modelo.
-                    </div>
-                    <div class="btn-container">
-                        <button class="btn-test" onclick="testBuscarTexto()">🧪 Probar</button>
-                    </div>
-                    <div id="result-texto" class="result"></div>
-                </div>
-
-                <h3>Operadores Lógicos ($and, $or)</h3>
-                <div class="endpoint">
-                    <span class="method get">GET</span>
-                    <span class="url">/api/buscar/operadores?operador=or&categoria1=Tecnología&categoria2=Ciencia</span>
-                    <div class="description">Búsqueda con operadores lógicos OR y AND.</div>
-                    <div class="example">
-// Ejemplo con $or
-?operador=or&categoria1=Tecnología&categoria2=Ciencia
-
-// Ejemplo con $and
-?operador=and&categoria1=Tecnología&visitasMin=10</div>
-                    <div class="btn-container">
-                        <button class="btn-test" onclick="testOperadores()">🧪 Probar $or</button>
-                    </div>
-                    <div id="result-operadores" class="result"></div>
-                </div>
-
-                <h3>Operadores de Comparación ($gt, $lt, $in)</h3>
-                <div class="endpoint">
-                    <span class="method get">GET</span>
-                    <span class="url">/api/buscar/comparacion?visitasMin=5&visitasMax=100&categorias=Tecnología,Ciencia</span>
-                    <div class="description">Búsqueda con operadores de comparación y el operador $in.</div>
-                    <div class="btn-container">
-                        <button class="btn-test" onclick="testComparacion()">🧪 Probar</button>
-                    </div>
-                    <div id="result-comparacion" class="result"></div>
-                </div>
-            </div>
-
-            <!-- OPERACIONES MÚLTIPLES -->
-            <div class="section">
-                <h2>🔄 3. Operaciones Múltiples</h2>
-
-                <h3>Actualización Múltiple</h3>
-                <div class="endpoint">
-                    <span class="method put">PUT</span>
-                    <span class="url">/api/actualizar-multiple</span>
-                    <div class="description">Actualiza múltiples artículos que cumplan un criterio.</div>
-                    <div class="example">
-{
-  "categoria": "Tecnología",
-  "datosActualizar": {
-    "publicado": true
-  }
-}</div>
-                </div>
-
-                <h3>Eliminación Múltiple</h3>
-                <div class="endpoint">
-                    <span class="method delete">DELETE</span>
-                    <span class="url">/api/eliminar-multiple</span>
-                    <div class="description">Elimina múltiples artículos por categoría.</div>
-                    <div class="example">
-{
-  "categoria": "Test"
-}</div>
-                    <div class="warning-box">
-                        <strong>⚠️ Cuidado:</strong> Esta operación eliminará todos los artículos de la categoría especificada.
-                    </div>
-                </div>
-            </div>
-
-            <!-- AGGREGATION PIPELINE -->
-            <div class="section">
-                <h2>📊 4. Aggregation Pipeline</h2>
-
-                <h3>Estadísticas por Categoría</h3>
-                <div class="endpoint">
-                    <span class="method get">GET</span>
-                    <span class="url">/api/estadisticas/categoria</span>
-                    <div class="description">Obtiene estadísticas agrupadas por categoría usando $match, $group y $project.</div>
-                    <div class="info-box">
-                        <strong>Pipeline utilizado:</strong>
-                        <ul style="margin-top: 10px; margin-left: 20px;">
-                            <li><code>$match</code> - Filtra artículos publicados</li>
-                            <li><code>$group</code> - Agrupa por categoría y calcula estadísticas</li>
-                            <li><code>$project</code> - Selecciona y formatea campos</li>
-                            <li><code>$sort</code> - Ordena por total de artículos</li>
-                        </ul>
-                    </div>
-                    <div class="btn-container">
-                        <button class="btn-test" onclick="testEstadisticas()">🧪 Probar</button>
-                    </div>
-                    <div id="result-estadisticas" class="result"></div>
-                </div>
-
-                <h3>Artículos Más Vistos</h3>
-                <div class="endpoint">
-                    <span class="method get">GET</span>
-                    <span class="url">/api/estadisticas/mas-vistos?limite=5</span>
-                    <div class="description">Obtiene los artículos más vistos usando aggregation.</div>
-                    <div class="btn-container">
-                        <button class="btn-test" onclick="testMasVistos()">🧪 Probar</button>
-                    </div>
-                    <div id="result-masvistos" class="result"></div>
-                </div>
-            </div>
-
-            <!-- ÍNDICES -->
-            <div class="section">
-                <h2>🗂️ 5. Índices</h2>
-
-                <div class="info-box">
-                    <h4>Índices creados en el modelo:</h4>
-                    <ul style="margin-top: 10px; margin-left: 20px;">
-                        <li><strong>Índice de texto:</strong> <code>{ titulo: 'text', contenido: 'text' }</code></li>
-                        <li><strong>Índice simple:</strong> <code>{ fecha: -1 }</code></li>
-                        <li><strong>Índice compuesto:</strong> <code>{ categoria: 1, fecha: -1 }</code></li>
-                    </ul>
-                </div>
-
-                <h3>Información de Índices</h3>
-                <div class="endpoint">
-                    <span class="method get">GET</span>
-                    <span class="url">/api/indices/info</span>
-                    <div class="description">Obtiene información sobre todos los índices de la colección.</div>
-                    <div class="btn-container">
-                        <button class="btn-test" onclick="testIndices()">🧪 Probar</button>
-                    </div>
-                    <div id="result-indices" class="result"></div>
-                </div>
-
-                <div class="grid">
-                    <div class="card">
-                        <h4>🎯 Índice de Texto</h4>
-                        <p>Permite búsquedas de texto completo en título y contenido con relevancia.</p>
-                    </div>
-                    <div class="card">
-                        <h4>📅 Índice Simple</h4>
-                        <p>Optimiza consultas ordenadas por fecha descendente.</p>
-                    </div>
-                    <div class="card">
-                        <h4>🔗 Índice Compuesto</h4>
-                        <p>Optimiza búsquedas por categoría y fecha simultáneamente.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- GUÍA RÁPIDA -->
-            <div class="section">
-                <h2>📚 Guía Rápida de Uso</h2>
-                
-                <div class="grid">
-                    <div class="card">
-                        <h4>1️⃣ Crear Artículos</h4>
-                        <p>Usa el botón "Probar" en CREATE para insertar artículos de prueba.</p>
-                    </div>
-                    <div class="card">
-                        <h4>2️⃣ Listar Artículos</h4>
-                        <p>Verifica que los artículos se crearon correctamente.</p>
-                    </div>
-                    <div class="card">
-                        <h4>3️⃣ Probar Búsquedas</h4>
-                        <p>Experimenta con las diferentes opciones de búsqueda avanzada.</p>
-                    </div>
-                    <div class="card">
-                        <h4>4️⃣ Ver Estadísticas</h4>
-                        <p>Prueba los endpoints de aggregation para ver estadísticas.</p>
-                    </div>
-                </div>
-
-                <div class="info-box" style="margin-top: 20px;">
-                    <h4>🔧 Herramientas Recomendadas</h4>
-                    <ul style="margin-top: 10px; margin-left: 20px;">
-                        <li><strong>MongoDB Compass:</strong> Para visualizar la base de datos</li>
-                        <li><strong>Postman:</strong> Para probar todos los endpoints</li>
-                        <li><strong>Thunder Client:</strong> Extensión de VS Code para pruebas</li>
-                    </ul>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        const API_URL = 'http://localhost:3900/api';
+    <!-- MODAL PARA EDITAR -->
+    <div id="modal-update" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Editar Artículo</h3>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            
+            <form id="form-update" class="interactive-form">
+                <input type="hidden" id="update-id">
+                
+                <div class="form-group">
+                    <label for="update-titulo">Título del Artículo</label>
+                    <input type="text" id="update-titulo" required>
+                </div>
 
-        function showResult(elementId, data, isError = false) {
-            const resultDiv = document.getElementById(elementId);
-            resultDiv.textContent = JSON.stringify(data, null, 2);
-            resultDiv.classList.add('show');
-            if (isError) {
-                resultDiv.classList.add('error');
-            } else {
-                resultDiv.classList.remove('error');
-            }
-        }
+                <div class="form-group">
+                    <label for="update-contenido">Contenido</label>
+                    <textarea id="update-contenido" required></textarea>
+                </div>
 
-        async function testCrear() {
-            try {
-                const response = await fetch(`${API_URL}/articulo`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        titulo: `Artículo de prueba ${Date.now()}`,
-                        contenido: 'Este es un artículo de prueba creado desde la interfaz de demostración',
-                        autor: 'Usuario Demo',
-                        categoria: 'Tecnología'
-                    })
-                });
-                const data = await response.json();
-                showResult('result-crear', data);
-            } catch (error) {
-                showResult('result-crear', { error: error.message }, true);
-            }
-        }
+                <div class="form-group">
+                    <label for="update-autor">Autor</label>
+                    <input type="text" id="update-autor" required>
+                </div>
 
-        async function testListar() {
-            try {
-                const response = await fetch(`${API_URL}/articulo`);
-                const data = await response.json();
-                showResult('result-listar', data);
-            } catch (error) {
-                showResult('result-listar', { error: error.message }, true);
-            }
-        }
+                <div class="form-group">
+                    <label for="update-categoria">Categoría</label>
+                    <select id="update-categoria">
+                        <option value="Tecnología">Tecnología</option>
+                        <option value="Ciencia">Ciencia</option>
+                        <option value="Educación">Educación</option>
+                        <option value="Deportes">Deportes</option>
+                        <option value="Arte">Arte</option>
+                        <option value="Salud">Salud</option>
+                    </select>
+                </div>
 
-        async function testBuscarCategoria() {
-            try {
-                const response = await fetch(`${API_URL}/categoria/Tecnología`);
-                const data = await response.json();
-                showResult('result-categoria', data);
-            } catch (error) {
-                showResult('result-categoria', { error: error.message }, true);
-            }
-        }
+                <div class="mongodb-query">
+                    <div class="mongodb-query-title">🔍 Query MQL que se ejecuta:</div>
+                    <div class="code-block">db.articulos.findByIdAndUpdate(
+  "id_del_articulo",
+  {
+    $set: {
+      titulo: "Nuevo título",
+      contenido: "Nuevo contenido",
+      autor: "Nuevo autor",
+      categoria: "Nueva categoría"
+    }
+  },
+  { new: true, runValidators: true }
+)</div>
+                </div>
 
-        async function testBuscarFiltros() {
-            try {
-                const response = await fetch(`${API_URL}/buscar/filtros?categoria=Tecnología&publicado=true`);
-                const data = await response.json();
-                showResult('result-filtros', data);
-            } catch (error) {
-                showResult('result-filtros', { error: error.message }, true);
-            }
-        }
+                <div class="btn-container">
+                    <button type="submit" id="update-btn" class="btn-primary">
+                        Guardar Cambios
+                    </button>
+                    <button type="button" class="btn-delete" onclick="closeEditModal()">
+                        Cancelar
+                    </button>
+                </div>
 
-        async function testBuscarTexto() {
-            try {
-                const response = await fetch(`${API_URL}/buscar/texto?texto=prueba`);
-                const data = await response.json();
-                showResult('result-texto', data);
-            } catch (error) {
-                showResult('result-texto', { error: error.message }, true);
-            }
-        }
+                <div id="result-update" class="result"></div>
+            </form>
+        </div>
+    </div>
 
-        async function testOperadores() {
-            try {
-                const response = await fetch(`${API_URL}/buscar/operadores?operador=or&categoria1=Tecnología&categoria2=Ciencia`);
-                const data = await response.json();
-                showResult('result-operadores', data);
-            } catch (error) {
-                showResult('result-operadores', { error: error.message }, true);
-            }
-        }
-
-        async function testComparacion() {
-            try {
-                const response = await fetch(`${API_URL}/buscar/comparacion?visitasMin=0&visitasMax=1000&categorias=Tecnología,Ciencia`);
-                const data = await response.json();
-                showResult('result-comparacion', data);
-            } catch (error) {
-                showResult('result-comparacion', { error: error.message }, true);
-            }
-        }
-
-        async function testEstadisticas() {
-            try {
-                const response = await fetch(`${API_URL}/estadisticas/categoria`);
-                const data = await response.json();
-                showResult('result-estadisticas', data);
-            } catch (error) {
-                showResult('result-estadisticas', { error: error.message }, true);
-            }
-        }
-
-        async function testMasVistos() {
-            try {
-                const response = await fetch(`${API_URL}/estadisticas/mas-vistos?limite=5`);
-                const data = await response.json();
-                showResult('result-masvistos', data);
-            } catch (error) {
-                showResult('result-masvistos', { error: error.message }, true);
-            }
-        }
-
-        async function testIndices() {
-            try {
-                const response = await fetch(`${API_URL}/indices/info`);
-                const data = await response.json();
-                showResult('result-indices', data);
-            } catch (error) {
-                showResult('result-indices', { error: error.message }, true);
-            }
-        }
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
