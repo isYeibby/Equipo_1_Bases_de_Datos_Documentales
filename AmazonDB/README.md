@@ -1,3 +1,3 @@
 # Amazon DocumentDB Demo
 
-Proyecto con CRUD y Aggregation Pipeline usando Amazon DocumentDB.
+Proyecto preparado para Amazon DocumentDB usando el driver oficial de MongoDB.
